@@ -781,6 +781,10 @@ var obj = Object.create(Object.prototype, {
 });
 
 
+(function () {
+	console.log(Object.getOwnPropertyDescriptor(arguments, "length"));
+})(1, 2, 3);
+
 
 
 
