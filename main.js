@@ -785,6 +785,163 @@ var obj = Object.create(Object.prototype, {
 	console.log(Object.getOwnPropertyDescriptor(arguments, "length"));
 })(1, 2, 3);
 
+// isXML
+// Sizzle实现
+var isXML_Sizzle = function (elem) {
+	var documentElement = elem && (elem.ownerDocument || elem).documentElement;
+	return documentElement ? documentElement.nodeName !== 'HTML' : false;
+};
+
+
+var isXML = function (doc) {
+	return doc.createElement('p').nodeName !== doc.createElement('P').nodeName;
+};
+
+function shuffle(a) {
+	// 洗牌
+	var array = a.concat();
+	var i = array.length;
+	while(i) {
+		var j = Math.floor(Math.random() * i);
+		var t = array[--i];
+		array[i] = array[j];
+		array[j] = t;
+	}	
+	return array;
+};
+
+var sliceNodes = function(arr) {
+	// 将NodeList转换为纯数组
+	var ret = [],
+		i = arr.length;
+	while (i) {
+		ret[--i] = arr[i];
+	}
+	return ret;
+};
+
+var sortNodes = function(a, b) {
+	// 节点排序
+	var p = 'parentNode',
+		ap = a[p],
+		bp = b[p];
+	if (a === b) {
+		return 0;
+	} else if (ap === bp) {
+		while(a = a.nextSibling) {
+			if (a === b) {
+				return -1;
+			}
+			return 1;
+		}
+	} else if (!ap) {
+		return -1;
+	} else if (!bp) {
+		return 1;
+	}
+	var al = [],
+		ap = a;
+	// 不断往上取一直取到HTML
+	while (ap && ap.nodeType === 1) {
+		al[al.length] = ap;
+		ap = ap[p];
+	}
+	var bl = [],
+		bp = b;
+	while(bp && bp.nodeType === 1) {
+		bl[bl.length] = bp;
+		bp = bp[p];
+	}
+	// 然后逐一去掉公共祖先
+	ap = al.pop();
+	bp = bl.pop();
+	while(ap === bp) {
+		ap = al.pop();
+		bp = bl.pop();
+	}
+	if (ap && bp) {
+		while(ap = ap.nextSibling) {
+			if (ap === bp) {
+				return -1;
+			}
+		}
+		return 1;
+	}
+	return ap ? 1 : -1;
+};
+
+function unique(nodes) {
+	if (nodes.length < 2) {
+		return nodes;
+	}
+	var result = [],
+		array = [],
+		uniqResult = {},
+		node = nodes[0],
+		index, ri = 0,
+		sourceIndex = typeof node.scoureIndex === "number",
+		compare = typeof node.compareDocumentPosition== "function";
+	if (!sourceIndex && !compare) {
+		var all = (node.ownerDocument || node).getElementsByTagName("*");
+		for (var index = 0; node = all[index]; index++) {
+			node.setAttribute("sourceIndex", index);
+		}
+		sourceIndex = true;
+	}
+	if (sourceIndex) {
+		for (var i = 0, n = nodes.length; i < n; i++) {
+			node = nodes[i];
+			index = (node.sourceIndex || node.getAttribute("sourceIndex")) + 1e8;
+			if (!uniqResult[index]) { // 去重
+				(array[ri++] = new String(index))._ = node;
+				uniqResult[index] = 1;
+			}
+		}
+		array.sort();
+		while (ri) {
+			result[--ri] = array[ri];
+		}
+		return result;
+	} else {
+		nodes.sort(sortOrder); // 排序
+		if (sortOrder.hasDuplicate) { // 去重
+			for (i = 1; i < nodes.length; i++) {
+				if (nodes[i] === nodes[i - 1]) {
+					nodes.splice(i--, 1);
+				}
+			}
+		}
+		sortOrder.hasDuolicate = false;
+		return nodes;
+	}
+}
+
+function sortOrder(a, b) {
+	if (a === b) {
+		sortOrder.hasDuplicate = true;
+		return 0;
+	}
+	if (!a.compareDocumentPosition || !b.compareDocuemntPosition) {
+		return a.compareDocumentPosition ? -1 : 1;
+	}
+	return a.compareDocumentPosition(b) & 4 ? -1 : 1;
+}
+
+var Icarus_slice_reg_0 = /[\w\u00a1-\uFFFF][\w\u00a1-\uFFFF-]*|[#.:\[][\w\(\)\]]+|\s*[>+~,*]\s*|\s+/g;
+
+// 让小括号里面的东西不被切割
+var Icarus_slice_reg_1 = /[\w\u00a1-\uFFFF][\w\u00a1-\uFFFF-]*|[#.:\[](?:[\w\u00a1-\uFFFF-]|\([^\)]*\)|\])+|(?:\s*)[>+~,*](?:\s*)|\s+/g;
+
+// 确保属性选择器作为一个完整的词素
+var Icarus_slice_reg_2 = /[\w\u00a1-\uFFFF][\w\u00a1-\uFFFF-]*|[#.:](?:[\w\u00a1-\uFFFF-]|\S*\([^\)]*\)|\])+|\[[^\]]*\]|(?:\s*)[>+~,*](?:\s*)|\s+/g;
+
+// 缩小后代选择器的范围
+var Icarus_slice_reg_3 = /[\w\u00a1-\uFFFF][\w\u00a1-\uFFFF-]*|[#.:](?:[\w\u00a1-\uFFFF-]|\S+\([^\)]*\])+|\[[^\]]*\]|(?:\s*)[>+~,*](?:\s*)|\s(?=[\w\u00a1-\uFFFF*#.[:])/g;
+
+
+
+
+
 
 
 
