@@ -938,6 +938,20 @@ var Icarus_slice_reg_2 = /[\w\u00a1-\uFFFF][\w\u00a1-\uFFFF-]*|[#.:](?:[\w\u00a1
 // 缩小后代选择器的范围
 var Icarus_slice_reg_3 = /[\w\u00a1-\uFFFF][\w\u00a1-\uFFFF-]*|[#.:](?:[\w\u00a1-\uFFFF-]|\S+\([^\)]*\])+|\[[^\]]*\]|(?:\s*)[>+~,*](?:\s*)|\s(?=[\w\u00a1-\uFFFF*#.[:])/g;
 
+function createNamedElement(type, name) {
+	var element = null;
+	try {
+		element = document.createElement('<' + type + ' name="' + name + '">');
+	} catch(e) {
+		
+	}
+	if (!element || element.nodeName != type.toUpperCase()) {
+		element = document.createElement(type);
+		element.name = name;
+	}
+	return element;
+}
+
 
 
 
