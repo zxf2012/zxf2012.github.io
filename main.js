@@ -952,9 +952,160 @@ function createNamedElement(type, name) {
 	return element;
 }
 
+if (typeof HTMLElement !== 'undefined' && !HTMLElement.prototype.insertAdjacentElement) {
+	HTMLElement.prototype.insertAdjacentElement = function (where, parseNode) {
+		switch (where.toLowerCase()) {
+			case "beforebegin":
+				this.parentNode.insertBefore(parseNode, this);
+				break;
+			case "afterbegin":
+				this.insertBefore(parseNode, this.firstChild);
+				break;
+			case "beforeend":
+				this.appendChild(parseNode);
+				break;
+			case "afterend":
+				if (this.nextSibling) {
+					this.parentNode.insertBefore(parseNode, this.nextSibling);
+				} else {
+					this.parentNode.appendChild(parseNode);
+				}
+				break;
+		}
+	};
+	HTMLElement.prototype.insertAdjacentHTML = function (where, htmlstr) {
+		var r = this.ownerDocument.createRange();
+		r.setStartBefore(this);
+		var parsedHTML = r.createContextualFragment(htmlstr);
+		this.insertAdjacentElement(where, parsedHTML);
+	};
+	HTMLElement.prototype.insertAdjacentText = function (where, textstr) {
+		var parsedText = document.createTextNode(textstr);
+		this.insertAdjacentElement(parsedText);
+	};
+}
 
+function $$(a, b) { //第一个构造器
+	return new $$.fn.init(a, b); //第二个构造器
+}
+//将原型对象放到一个名字更短更好记的属性名中
+//这是jQuery人性化的体现也方便扩展原型方法
+$$.fn = $$.prototype = {
+	init: function(a, b) {
+		this.a = a;
+		this.b = b;
+	}
+};
+//共用同一个原型
+$$.fn.init.prototype = $$.fn;
+var a = $$(1, 2);
+console.log(a instanceof $$);
+console.log(a instanceof $$.fn.init);
 
+function getIframeDocument(node) {
+	return node.contentDocument || node.contentDocument.document;
+};
+// 判断页面是否在iframe中打开
+window.onload = function () {
+	console.log(window != window.top);
+	console.log(window.frameElement !== null);
+	console.log(window.eval !== top.eval);
+};
+ 
+// 判定iframe是否加载完毕
+function detectIframeLoaded(iframe, callback) {
+	if (iframe.addEventListener) {
+		iframe.addEventListener("load", callback, false);
+	} else {
+		iframe.attach("onload", callback);
+	}	 
+};
 
+// 判断iframe与父页面同源
+function isSameOrigin(el) {
+	var ret = false;
+	try {
+		ret = !!el.contentWindow.location.href;
+	} catch (e) {
+		
+	}
+	return ret;
+}
+
+// 特性（attributes）和属性（properties）的区别是，你不可以在HTML中使用属性，而可以在HTML和脚本中使用特性
+// 通过下面的脚本挖掘更多新的属性
+// window.onload = function () {
+// 	var el = document.getElementById('video');
+// 	var body = document.body;
+// 	for (var i in el) {
+// 		if (typeof body[i] === "undefined") {
+// 			console.log(i, ' --- ', el[i]);
+// 		}
+// 	}
+// };
+
+$(function () {
+	$("div#btn").click(function() {
+	    var sort_by_name = function(a, b) {
+	        return a.innerHTML.toLowerCase().localeCompare(b.innerHTML.toLowerCase());
+	    }
+	    
+	    var list = $("#table1 > li").get();
+	    list.sort(sort_by_name);
+	    for (var i = 0; i < list.length; i++) {
+	        list[i].parentNode.appendChild(list[i]);
+	    }
+	});
+});
+
+var getStyle = function (el, name) {
+	if (el.style) {
+		name = name.replace(/\-(\w)/g, function (all, letter) {
+			return letter.toUpperCase();
+		});
+		if (window.getComputedStyle) {
+			return window.getComputedStyle(el, null)[name];
+		} else {
+			return el.currentStyle[name];
+		}
+	}
+};
+
+function showHidden(node, array) {
+	if (node && node.nodeType === 1 && node.offsetWidth<= 0) { // opera.offsetWidth可能小于0
+		if (getter(node, 'display') === 'none') {
+			var obj = {
+				node: node
+			};
+			for (var name in cssShow) {
+				obj[name] = noe.style[name];
+				node.style[name] = cssShow[name] || $.parseDisplay(node.nodeName);
+			}
+			array.push(obj);
+		}
+		showHidden(node.parentNode, array);
+	}	
+};
+
+var windowWidth = document.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+console.log('windowWidth is:' + windowWidth);
+
+var pageWidth = Math.max(document.documentElement.scrollWidth, document.documentElement.offsetWidth, document.documentElement.clientWidth,
+	document.body.scrollWidth, document.body.offsetWidth);
+console.log('pageWidth is:' + pageWidth);
+
+function offset(node) {
+	var left = 0,
+		top = 0;
+	do {
+		left += node.offsetLeft;
+		top += node.offsetTop;
+	} while(node = node.offsetParent);
+	return {
+		left: left,
+		top: top
+	};
+};
 
 
 

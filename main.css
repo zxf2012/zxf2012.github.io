@@ -8,3 +8,10 @@ p {
 	width: 100%;
 	font-size: 18px;
 }
+
+div#btn{
+    background:lightblue;
+    border: 1px solid black;
+    margin: 0.15em 0.25em;
+    width:5em;
+}
