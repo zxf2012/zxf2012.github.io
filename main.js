@@ -1107,6 +1107,150 @@ function offset(node) {
 	};
 };
 
+var getClass = function (ele) {
+	return ele.classNmae.replace(/\s+/, " ").split(" ");
+};
+
+var hasClass = function (ele, cls) {
+	return -1 < (" " + ele.className + " ").indexOf(" " + cls + " ");
+};
+
+var addClass = function (ele, cls) {
+	if (!hasClass(ele, cls)) {
+		ele.className += " " + cls;
+	}
+};
+
+var removeClass = function (ele, cls) {
+	if (hasClass(ele, cls)) {
+		var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');
+		ele.className = ele.className.replace(reg, " ");
+	}
+};
+
+var clearClass = function (ele) {
+	ele.className = "";
+};
+
+jquery_addClass = function (value) {
+	var classNames, i, l, elem, setClass, c, cl;
+	if (jQuery.isFunction(value)) {
+		return this.each(function(j) {
+			jQuery(this).addClass(value.call(this, j, this.className));
+		});
+	}
+	if (value && typeof value === 'string') {
+		classNames = value.split(/\s+/);
+		for(i = 0, l = this.length; i < l; i++) {
+			elem = this[i];
+			if (elem.nodeType === 1) {
+				if (!elem.className && classNames.length === 1) {
+					elem.className = value;
+				} else {
+					setClass = " " + elem.className + " ";
+					for (c = 0, cl = classNames.length; c < cl; c++) {
+						if (setClass.indexOf(" " + classNames[c] + " ") < 0) {
+							setClassName += classNames[c] + " ";
+						}
+					}
+					elem.className = jQuery.trim(setClass);
+				}
+			}
+		}
+	}
+};
+
+mass_removeClass = function (item) {
+	if ((item && typeof item === 'string') || item === void 0) {
+		for (var i = 0, node; node = this[i++]; ) {
+			if (node.nodeType === 1 && node.className) {
+				if (item) { //rnospaces = /S+/g
+					var set = " " + node.className.match(rnospaces).join(" ") + " ";
+					for (var c = 0, cl = classNames.length; c < cl; c++) {
+						set = set.replace(" " + classNames[c] + " ", " ");
+					}
+					node.className = set.slice(1, set.length - 1);
+				} else {
+					node.className = "";
+				}
+			}
+		}
+	}
+	return this;
+};
+
+mass_hasClass = function (item, every) {
+	var method = every === true ? 'every' : 'some',
+		rclass = new RegExp('(\\s|^)' + item + '(\\s|$)');
+	return $.slice(this)[method](function(el) {
+		return "classList" in el ? el.classList.contains(item) :
+			(el.className || "").match(rclass);
+	})
+};
+
+mass_toggleClass = function (value) {
+	var type = typeof value, className, i,
+	classNames = type === "string" && value.match(/\S+/g) || [];
+	return this.each(function (el) {
+		i = 0;
+		if (el.nodeType === 1) {
+			var self = $(el);
+			if (type === 'string') {
+				while((className = classNames[i++])) {
+					self[self.hasCalss(className) ? 'removeClass' : 'addCalss'](className);
+				}
+			} else if (type === 'undefined' || type === 'boolean') {
+				if (el.className) {
+					$._data(el, "__className__", el.className);
+				}
+				el.className = el.className || value === false ? "" : $._data(el, '__className__') || "";
+			}
+		}
+	});
+};
+
+mass_replaceClass = function (old, neo) {
+	for (var i = 0, node; node = this[i++]; ) {
+		if (node.nodeType === 1 && node.className) {
+			var arr = node.className.match(rnospaces), arr2 = [];
+			for (var j = 0; j < arr.length; j ++) {
+				arr2.push(arr[j] == old ? neo : arr[j]);
+			}
+			node.className = arr2.join(" ");
+		}
+	}
+	return this;
+};
+
+prototype_readAttribute = function (element, name) {
+	element = $(element);
+	var t = Element._attributeTranslations.read;
+	if (t.values[name]) {
+		return t.values[name](element, name);
+	}
+	if (t.names[name]) {
+		name = t.names[name];
+	}
+	if (name.include(':')) {
+		return (!element.attributes || !element.attributes[name]) ? null : element.attributes[name].value;
+	}
+	return element.getAttribute(name);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
